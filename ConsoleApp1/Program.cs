@@ -10,14 +10,21 @@ namespace ConsoleApp1
 {
     class Program
     {
+        enum GameState {
+            going,
+            done
+        };
         static void Main(string[] args)
         {
+            //Console.OutputEncoding = System.Text.Encoding.UTF8;
             Regex regex = new Regex(@"([\d]{1,3})");
             Regex regex_limiter = new Regex(@"^([\d]{1,3}[\ \,][\d]{1,3})$");
-            Minesweepergame.MineSweeper game = new Minesweepergame.MineSweeper(5,1);
+            GameState gamestate = GameState.going;
+            Minesweepergame.MineSweeper game = new Minesweepergame.MineSweeper(10,5);
             int size = game.GetMapSize();
-            Console.WriteLine(game.ToString());
+            Console.WriteLine(game.ToStringCover());
             int[] cords = new int[2];
+            
             do
             {
                 Console.WriteLine($"pick an y,x. it is a [{size},{size}] map");
@@ -29,12 +36,21 @@ namespace ConsoleApp1
                 {
                     cords[0] = int.Parse(capture[0].Value);
                     cords[1] = int.Parse(capture[1].Value);
+                    if(game.PickSpot(cords[0], cords[1]))
+                    {
+                       gamestate = GameState.going;
+                    }
+                    else
+                    { 
+                        gamestate = GameState.done;
+                    }
+                    game.reveal(cords[0], cords[1]);
                 }
                 else
                 {
                     continue;
                 }
-            } while (game.PickSpot(cords[0], cords[1]));
+            } while (gamestate == GameState.going);
             Console.WriteLine("Game over!");
             Console.ReadLine();
         }

@@ -9,8 +9,25 @@ namespace ConsoleApp1.Minesweepergame
     class MineSweeper
     {
         spot[,] _Map;
+        place[,] _Places;
         byte _NumOfBombs;
         byte _size;
+
+        public enum place
+        {
+            capped = 'x',
+            cover =  '?',//'⊞',
+            empty = '*',
+            one = '1',
+            two = '2',
+            three = '3',
+            four = '4',
+            five = '5',
+            six = '6',
+            seven = '7',
+            bomb = '!'
+
+        }
 
         public enum spot
         {
@@ -30,6 +47,7 @@ namespace ConsoleApp1.Minesweepergame
         {
             _size = Size;
             _Map = new spot[_size, _size];
+            _Places = new place[_size,_size];
             _NumOfBombs = BombCount;
             int limit = _size - 5;
             int i = 0;
@@ -41,11 +59,17 @@ namespace ConsoleApp1.Minesweepergame
                     _Map[i + 2, j] = spot.free;
                     _Map[i + 3, j] = spot.free;
                     _Map[i + 4, j] = spot.free;
+                    _Places[i,j] = place.cover;
+                    _Places[i + 1,j] = place.cover;
+                    _Places[i + 2,j] = place.cover;
+                    _Places[i + 3,j] = place.cover;
+                    _Places[i + 4,j] = place.cover;
                 }
             for (; i < _size; i++)
                 for (int j = 0; j < _size; j += 1)
                 {
                     _Map[i, j] = spot.free;
+                    _Places[i,j] = place.cover;
                 }
             _SetBombs();
             _SetLocations();
@@ -63,19 +87,22 @@ namespace ConsoleApp1.Minesweepergame
             return true;
         }
 
+        public void reveal (int d1, int d2){
+            throw NotImplementedException;
+        }
+
         private void _SetLocations(){
             int[,] directions = new int[8,2] {{-1,-1},{-1,0},{-1,1},{0,-1},{0,1},{1,-1},{1,0},{1,1}};
             int number = 0;
             int iteration =0;
             int size = Convert.ToInt32(_size);
             for(int i = 0; i < _size; i++)
-            {
                 for(int j = 0; j < _size; j++){
                     if(_Map[i,j] == spot.free)
                         _Map[i,j] = _determine(i,j);
+                    iteration = 0;
+                    number = 0;
                 }
-                iteration = 0;
-            }
             
             bool _inRange(int x, int y){
                 if( 0 <= x && x < size && 0 <= y && y < size)
@@ -84,8 +111,8 @@ namespace ConsoleApp1.Minesweepergame
             }
         
             spot _determine(int d1, int d2){
-                if( _inRange(d1 + directions[number,0],d2 + directions[number,1]) &&
-                    _Map[d1 + directions[number,0],d2 + directions[number,1]] == spot.bomb){
+                if( _inRange(d1 + directions[iteration,0],d2 + directions[iteration,1]) &&
+                    _Map[d1 + directions[iteration,0],d2 + directions[iteration,1]] == spot.bomb){
                     number++;
                 }
                 if(iteration == 7)
@@ -137,6 +164,17 @@ namespace ConsoleApp1.Minesweepergame
                 for (int j = 0; j < _size; j += 1)
                 {
                     @string.Append($"[{i},{j}] {_Map[i, j]} ");
+                }
+                @string.Append("\r\n");
+            }
+            return @string.ToString();
+        }
+
+        public string ToStringCover(){
+            StringBuilder @string = new StringBuilder();
+            for (int i=0; i < _size; i++){
+                for (int j = 0; j < _size; j++){
+                @string.Append($"{(char) _Places[i,j]} ");
                 }
                 @string.Append("\r\n");
             }
