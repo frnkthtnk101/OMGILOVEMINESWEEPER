@@ -12,28 +12,28 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            Regex regex = new Regex(@"([\d]{0,3})");
-            Minesweepergame.MineSweeper game = new Minesweepergame.MineSweeper(25,5);
+            Regex regex = new Regex(@"([\d]{1,3})");
+            Regex regex_limiter = new Regex(@"^([\d]{1,3}[\ \,][\d]{1,3})$");
+            Minesweepergame.MineSweeper game = new Minesweepergame.MineSweeper(5,1);
+            int size = game.GetMapSize();
             Console.WriteLine(game.ToString());
             int[] cords = new int[2];
             do
             {
-                Console.WriteLine("pick an x,y");
+                Console.WriteLine($"pick an y,x. it is a [{size},{size}] map");
                 string input = Console.ReadLine();
-                if (regex.IsMatch(input))
+                MatchCollection capture = regex.Matches(input);
+                if (regex_limiter.IsMatch(input) &&
+                   int.Parse(capture[0].Value) < size &&
+                   int.Parse(capture[1].Value) < size )
                 {
-                    MatchCollection capture = regex.Matches(input);
                     cords[0] = int.Parse(capture[0].Value);
-                    cords[0] = int.Parse(capture[1].Value);
+                    cords[1] = int.Parse(capture[1].Value);
                 }
                 else
                 {
-                    cords[0] = -1;
-                    cords[1] = -1;
+                    continue;
                 }
-
-
-
             } while (game.PickSpot(cords[0], cords[1]));
             Console.WriteLine("Game over!");
             Console.ReadLine();
